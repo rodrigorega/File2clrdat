@@ -1,3 +1,4 @@
 - Process all files in a given directory.
 - Merge output file to pre-existing .dat file.
 - Find hashes in a pre-existing .dat file.
+- Check if utf8 is working with filenames.
