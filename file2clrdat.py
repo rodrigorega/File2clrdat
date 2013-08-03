@@ -27,12 +27,14 @@ def main():
     """
     Main...
     """
+    global scriptPath
     errorCodes = (
         'No error',  # error000
         'Use python file2clrdat.py file',  # error001
         'Invalid file',  # error001
         )
 
+    scriptPath = os.path.dirname(os.path.realpath(__file__))
     validateArgsReturn = validateArgs()  # check if we have correct arguments
     if validateArgsReturn == 0:  # if no error continue
         fileToHash = sys.argv[1]
@@ -93,7 +95,7 @@ def writeRomDataToFile(fileToHash, size, crc, md5, sha1):
         }
 
     # get template file
-    fileRomTemplate = open('ClrMamePro_rom_dat.tpl')
+    fileRomTemplate = open(os.path.join(scriptPath,'ClrMamePro_rom_dat.tpl'))
     templateSrc = string.Template(fileRomTemplate.read())
     fileRomTemplate.close()
 
