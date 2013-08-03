@@ -1,0 +1,13 @@
+This Python script generates "line rom" info from a single file.
+This info can be added manually to a ClrMamePro .dat.
+
+Generates one file with rom data from a sngle file. This data can be
+merged in a existing ClrMamePro .dat file.
+I use this to speed up the process of update my .dat files, without using
+ClrMamePro.
+
+Author: Rodrigo Rega <contacto@rodrigorega.es>
+License: CC-BY-SA 3.0 license (http://creativecommons.org/licenses/by/3.0/
+
+Use: file2clrdat filename.rom
+Output: filename.rom_romdata

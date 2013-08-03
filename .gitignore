@@ -213,3 +213,14 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+
+# Ignore everything
+*
+
+# But not these files...
+!file2clrdat.py
+!ClrMamePro_rom_dat.tpl
+!TODO
+!README
+!.gitignore
