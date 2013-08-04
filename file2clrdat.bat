@@ -1,0 +1,1 @@
+python file2clrdat.py "%~1"
