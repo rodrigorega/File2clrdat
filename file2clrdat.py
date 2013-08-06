@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-This Python script generates "line rom" info from a single file.
+This Python script generates "line rom" info from a file or files in a dir.
 This info can be added manually to a ClrMamePro .dat.
 
 Generates one file with rom data from a sngle file. This data can be
@@ -23,40 +23,77 @@ import string  # needed for templating
 import os  # needed to get size of files
 
 
-def main():
+def _main():
     """
     Main...
     """
     global scriptPath
+    global errorCode
+    errorCode = 0
     errorCodes = (
         'No error',  # error000
-        'Use python file2clrdat.py file',  # error001
-        'Invalid file',  # error001
+        'Use: python file2clrdat.py FILE_OR_DIRECTORY',  # error001
+        'Invalid file or directory',  # error002
         )
 
     scriptPath = os.path.dirname(os.path.realpath(__file__))
-    validateArgsReturn = validateArgs()  # check if we have correct arguments
-    if validateArgsReturn == 0:  # if no error continue
-        fileToHash = sys.argv[1]
-        crc, md5, sha1 = getFileHashes(fileToHash)
-        writeRomDataToFile(
-            fileToHash, os.path.getsize(fileToHash), crc, md5, sha1
-            )
-    else:
-        print('- Error:', errorCodes[validateArgsReturn])
-        sys.exit(1)
+
+    _argsCheck()  # check if we have correct arguments
+    if not errorCode:  # if no error continue
+        readInputWriteOutput(sys.argv[1])
+
+    if errorCode:
+        print('- Error:', errorCodes[errorCode])
+        sys.exit(errorCode)
 
 
-def validateArgs():
+def _argsCheck():
     """
     Validate arguments passed to the script, return 0 is no error
     """
+    global errorCode
+
     if len(sys.argv) != 2:
-        return(1)
-    if not os.path.isfile(sys.argv[1]):  # if not exists or is not a file
-        return(2)
+        errorCode = 1
+
+
+def readInputWriteOutput(inputPath):
+    """
+    Calls functions to read input and write output file
+    """
+    global errorCode
+
+    if os.path.isfile(inputPath):
+        # get file hashes
+        fileToHash, fileSize, crc, md5, sha1 = getFileHashes(inputPath)
+
+        # write file hashes to output file
+        writeRomDataToFile(fileToHash, fileSize, crc, md5, sha1)
     else:
-        return(0)
+        if os.path.isdir(inputPath):
+            directoryHashes = getDirectoryHashes(inputPath)
+
+            for fileHash in directoryHashes:
+                # get file hashes
+                fileToHash, fileSize, crc, md5,
+                sha1 = getFileHashes(fileHash[0])
+
+                # write file hashes to output file
+                writeRomDataToFile(fileToHash, fileSize, crc, md5, sha1)
+        else:
+            errorCode = 2
+
+
+def getDirectoryHashes(inputPath):
+    """
+    Returns all data related to the files that receives
+    """
+
+    allFilesData = []
+    files = [f for f in os.listdir(inputPath) if os.path.isfile(f)]
+    for file in files:
+        allFilesData.append(getFileHashes(file))
+    return(allFilesData)
 
 
 def getFileHashes(filePath):
@@ -65,7 +102,6 @@ def getFileHashes(filePath):
     """
     BUFFER_SIZE = 8192  # we will process file in chunks of this size
     crc = 0
-
     with open(filePath, 'rb') as openedFile:
         md5 = hashlib.md5()
         sha1 = hashlib.sha1()
@@ -77,7 +113,13 @@ def getFileHashes(filePath):
             crc = zlib.crc32(data, crc)
             data = openedFile.read(BUFFER_SIZE)  # read next chunk from file
 
-        return ("%X" % (crc & 0xFFFFFFFF), md5.hexdigest(), sha1.hexdigest())
+        return(
+            filePath,
+            str(os.path.getsize(filePath)),  # needs to be converted to str...
+            "%X" % (crc & 0xFFFFFFFF),
+            md5.hexdigest(),
+            sha1.hexdigest()
+            )
 
 
 def writeRomDataToFile(fileToHash, size, crc, md5, sha1):
@@ -95,7 +137,7 @@ def writeRomDataToFile(fileToHash, size, crc, md5, sha1):
         }
 
     # get template file
-    fileRomTemplate = open(os.path.join(scriptPath,'ClrMamePro_rom_dat.tpl'))
+    fileRomTemplate = open(os.path.join(scriptPath, 'ClrMamePro_rom_dat.tpl'))
     templateSrc = string.Template(fileRomTemplate.read())
     fileRomTemplate.close()
 
@@ -113,4 +155,4 @@ if __name__ == "__main__":
         print('You must use Python 2,7 or higher')
         sys.exit(2)
 
-    main()
+    _main()
