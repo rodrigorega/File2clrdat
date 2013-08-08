@@ -126,9 +126,11 @@ def writeRomDataToFile(fileToHash, size, crc, md5, sha1):
     """
     Writes rom data to finla file
     """
+    fileToHash = os.path.basename(fileToHash)  # remove path
+    fileToHashNoExt = os.path.splitext(fileToHash)[0]
     templateDictionary = {
-        'gameName': fileToHash,
-        'romDescription': fileToHash,
+        'gameName': fileToHashNoExt,
+        'romDescription': fileToHashNoExt,
         'romName': fileToHash,
         'romSize': size,
         'romCrc': crc.lower(),
