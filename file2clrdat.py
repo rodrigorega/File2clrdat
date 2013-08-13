@@ -17,10 +17,10 @@ Output: filename.rom_romdata
 
 from __future__ import print_function  # used for print to files
 import sys
-import hashlib  # needed to hash md5 and sha1
-import zlib  # neeeded to hash crc32
 import string  # needed for templating
-import os  # needed to get size of files
+import os
+
+from file import File
 
 
 def _main():
@@ -65,10 +65,18 @@ def readInputWriteOutput(inputPath):
 
     if os.path.isfile(inputPath):
         # get file hashes
-        fileToHash, fileSize, crc, md5, sha1 = getFileHashes(inputPath)
+        objFile = File(inputPath)
+        objFile.getHashes()
 
         # write file hashes to output file
-        writeRomDataToFile(fileToHash, fileSize, crc, md5, sha1)
+        writeRomDataToFile(
+            objFile.pathAndName,
+            objFile.size,
+            objFile.crc32,
+            objFile.md5,
+            objFile.sha1
+            )
+        
     else:
         if os.path.isdir(inputPath):
             directoryHashes = getDirectoryHashes(inputPath)
@@ -96,42 +104,16 @@ def getDirectoryHashes(inputPath):
     return(allFilesData)
 
 
-def getFileHashes(filePath):
-    """
-    Calculates hashes and return them
-    """
-    BUFFER_SIZE = 8192  # we will process file in chunks of this size
-    crc = 0
-    with open(filePath, 'rb') as openedFile:
-        md5 = hashlib.md5()
-        sha1 = hashlib.sha1()
-
-        data = openedFile.read(BUFFER_SIZE)  # read first chunk from file
-        while data:  # if there is data in chunk, process it
-            md5.update(data)
-            sha1.update(data)
-            crc = zlib.crc32(data, crc)
-            data = openedFile.read(BUFFER_SIZE)  # read next chunk from file
-
-        return(
-            filePath,
-            str(os.path.getsize(filePath)),  # needs to be converted to str...
-            "%X" % (crc & 0xFFFFFFFF),
-            md5.hexdigest(),
-            sha1.hexdigest()
-            )
-
-
 def writeRomDataToFile(fileToHash, size, crc, md5, sha1):
     """
-    Writes rom data to finla file
+    Writes rom data to final file
     """
-    fileToHash = os.path.basename(fileToHash)  # remove path
-    fileToHashNoExt = os.path.splitext(fileToHash)[0]
+    fileNameToHash = os.path.basename(fileToHash)  # remove path
+    fileNameToHashNoExt = os.path.splitext(fileNameToHash)[0]
     templateDictionary = {
-        'gameName': fileToHashNoExt,
-        'romDescription': fileToHashNoExt,
-        'romName': fileToHash,
+        'gameName': fileNameToHashNoExt,
+        'romDescription': fileNameToHashNoExt,
+        'romName': fileNameToHash,
         'romSize': size,
         'romCrc': crc.lower(),
         'romMd5': md5,
