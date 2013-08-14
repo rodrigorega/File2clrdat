@@ -71,6 +71,9 @@ def readInputWriteOutput(inputPath):
         # write file hashes to output file
         writeRomDataToFile(
             objFile.pathAndName,
+            objFile.name,
+            objFile.nameNoExtension,
+            objFile.path,
             objFile.size,
             objFile.crc32,
             objFile.md5,
@@ -104,12 +107,19 @@ def getDirectoryHashes(inputPath):
     return(allFilesData)
 
 
-def writeRomDataToFile(fileToHash, size, crc, md5, sha1):
+def writeRomDataToFile(
+        fileToHash,
+        fileNameToHash,
+        fileNameToHashNoExt,
+        path,
+        size,
+        crc,
+        md5,
+        sha1
+        ):
     """
     Writes rom data to final file
     """
-    fileNameToHash = os.path.basename(fileToHash)  # remove path
-    fileNameToHashNoExt = os.path.splitext(fileNameToHash)[0]
     templateDictionary = {
         'gameName': fileNameToHashNoExt,
         'romDescription': fileNameToHashNoExt,
