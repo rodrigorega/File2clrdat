@@ -69,17 +69,7 @@ def readInputWriteOutput(inputPath):
         objFile.getHashes()
 
         # write file hashes to output file
-        writeRomDataToFile(
-            objFile.pathAndName,
-            objFile.name,
-            objFile.nameNoExtension,
-            objFile.path,
-            objFile.size,
-            objFile.crc32,
-            objFile.md5,
-            objFile.sha1
-            )
-        
+        writeRomDataToFile(objFile)
     else:
         if os.path.isdir(inputPath):
             directoryHashes = getDirectoryHashes(inputPath)
@@ -106,28 +96,18 @@ def getDirectoryHashes(inputPath):
         allFilesData.append(getFileHashes(file))
     return(allFilesData)
 
-
-def writeRomDataToFile(
-        fileToHash,
-        fileNameToHash,
-        fileNameToHashNoExt,
-        path,
-        size,
-        crc,
-        md5,
-        sha1
-        ):
+def writeRomDataToFile(objFile):
     """
     Writes rom data to final file
     """
     templateDictionary = {
-        'gameName': fileNameToHashNoExt,
-        'romDescription': fileNameToHashNoExt,
-        'romName': fileNameToHash,
-        'romSize': size,
-        'romCrc': crc,
-        'romMd5': md5,
-        'romSha1': sha1
+        'gameName': objFile.nameNoExtension,
+        'romDescription': objFile.nameNoExtension,
+        'romName': objFile.name,
+        'romSize': objFile.size,
+        'romCrc': objFile.crc32,
+        'romMd5': objFile.md5,
+        'romSha1': objFile.sha1
         }
 
     # get template file
@@ -137,7 +117,7 @@ def writeRomDataToFile(
 
     # write to output file template and data
     templateWithData = templateSrc.safe_substitute(templateDictionary)
-    f = open(fileToHash + '_romdata', "w")
+    f = open(objFile.pathAndName + '_romdata', "w")
     print(templateWithData, file=f)
     f.close()
 
