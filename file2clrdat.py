@@ -64,37 +64,26 @@ def readInputWriteOutput(inputPath):
     global errorCode
 
     if os.path.isfile(inputPath):
-        # get file hashes
         objFile = File(inputPath)
         objFile.getHashes()
-
-        # write file hashes to output file
         writeRomDataToFile(objFile)
     else:
         if os.path.isdir(inputPath):
-            directoryHashes = getDirectoryHashes(inputPath)
+            inputPath = os.path.abspath(inputPath)
 
-            for fileHash in directoryHashes:
-                # get file hashes
-                fileToHash, fileSize, crc, md5,
-                sha1 = getFileHashes(fileHash[0])
-
-                # write file hashes to output file
-                writeRomDataToFile(fileToHash, fileSize, crc, md5, sha1)
+            files = [
+                f for f in os.listdir(inputPath)
+                if os.path.isfile(
+                    os.path.join(inputPath, os.path.basename(f))
+                    )
+                ]
+            for file in files:
+                objFile = File(os.path.join(inputPath, file))
+                objFile.getHashes()
+                writeRomDataToFile(objFile)
         else:
             errorCode = 2
 
-
-def getDirectoryHashes(inputPath):
-    """
-    Returns all data related to the files that receives
-    """
-
-    allFilesData = []
-    files = [f for f in os.listdir(inputPath) if os.path.isfile(f)]
-    for file in files:
-        allFilesData.append(getFileHashes(file))
-    return(allFilesData)
 
 def writeRomDataToFile(objFile):
     """
