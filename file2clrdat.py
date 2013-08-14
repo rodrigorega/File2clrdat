@@ -64,26 +64,23 @@ def readInputWriteOutput(inputPath):
     global errorCode
 
     if os.path.isfile(inputPath):
-        objFile = File(inputPath)
-        objFile.getHashes()
-        writeRomDataToFile(objFile)
+        writeRomDataToFile(getRomData(inputPath))
     else:
         if os.path.isdir(inputPath):
             inputPath = os.path.abspath(inputPath)
-
-            files = [
-                f for f in os.listdir(inputPath)
-                if os.path.isfile(
-                    os.path.join(inputPath, os.path.basename(f))
-                    )
-                ]
-            for file in files:
-                objFile = File(os.path.join(inputPath, file))
-                objFile.getHashes()
-                writeRomDataToFile(objFile)
+            for file in os.listdir(inputPath):
+                fullPath = os.path.join(inputPath, os.path.basename(file))
+                if os.path.isfile(fullPath):
+                    writeRomDataToFile(getRomData(fullPath))
         else:
             errorCode = 2
 
+def getRomData(inputPath):
+    """ Gets rom data with File class """
+    objFile = File(inputPath)
+    objFile.getHashes()
+    return(objFile)
+    
 
 def writeRomDataToFile(objFile):
     """
