@@ -115,7 +115,7 @@ def writeRomDataToFile(fileToHash, size, crc, md5, sha1):
         'romDescription': fileNameToHashNoExt,
         'romName': fileNameToHash,
         'romSize': size,
-        'romCrc': crc.lower(),
+        'romCrc': crc,
         'romMd5': md5,
         'romSha1': sha1
         }

@@ -51,5 +51,6 @@ class File():
                 # read next chunk from file
                 data = openedFile.read(self.FILE_BLOCK_SIZE_READ)
             self.crc32 = "%X" % (self.crc32 & 0xFFFFFFFF)
+            self.crc32 = self.crc32.lower()
             self.md5 = self.md5.hexdigest()
             self.sha1 = self.sha1.hexdigest()
