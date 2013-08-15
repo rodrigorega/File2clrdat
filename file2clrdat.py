@@ -24,9 +24,7 @@ from file import File
 
 
 def _main():
-    """
-    Main...
-    """
+    """ Main... """
     global scriptPath
     global errorCode
     errorCode = 0
@@ -48,9 +46,7 @@ def _main():
 
 
 def _argsCheck():
-    """
-    Validate arguments passed to the script, return 0 is no error
-    """
+    """ Validate arguments passed to the script """
     global errorCode
 
     if len(sys.argv) != 2:
@@ -58,9 +54,7 @@ def _argsCheck():
 
 
 def readInputWriteOutput(inputPath):
-    """
-    Calls functions to read input and write output file
-    """
+    """ Calls functions to read input and writes output file """
     global errorCode
 
     if os.path.isfile(inputPath):
@@ -83,9 +77,7 @@ def getRomData(inputPath):
     
 
 def writeRomDataToFile(objFile):
-    """
-    Writes rom data to final file
-    """
+    """ Writes rom data to output file """
     templateDictionary = {
         'gameName': objFile.nameNoExtension,
         'romDescription': objFile.nameNoExtension,
