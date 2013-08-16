@@ -16,87 +16,77 @@ Output: filename.rom_romdata
 """
 
 from __future__ import print_function  # used for print to files
-import sys
+import sys  # needed for get python version and argv
 import string  # needed for templating
-import os
-
-from file import File
-
-
-def _main():
-    """ Main... """
-    global scriptPath
-    global errorCode
-    errorCode = 0
-    errorCodes = (
-        'No error',  # error000
-        'Use: python file2clrdat.py FILE_OR_DIRECTORY',  # error001
-        'Invalid file or directory',  # error002
-        )
-
-    scriptPath = os.path.dirname(os.path.realpath(__file__))
-
-    _argsCheck()  # check if we have correct arguments
-    if not errorCode:  # if no error continue
-        readInputWriteOutput(sys.argv[1])
-
-    if errorCode:
-        print('- Error:', errorCodes[errorCode])
-        sys.exit(errorCode)
+import os  # needed for file and path manipulations
+from file import File  # class for get file data (hashes, size, etc)
 
 
-def _argsCheck():
-    """ Validate arguments passed to the script """
-    global errorCode
+class File2clrdat:
+    """ file2clrdat class """
 
-    if len(sys.argv) != 2:
-        errorCode = 1
+    def __init__(self, inputPath):
+        """ Class initialiser """
+        self.inputPath = inputPath
 
+    inputPath = None
+    fileData = None
+    SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
+    romTemplateFile = os.path.join(SCRIPT_PATH, 'ClrMamePro_rom_dat.tpl')
+    romTemplateContent = None
+    romTemplatePopulated = None
 
-def readInputWriteOutput(inputPath):
-    """ Calls functions to read input and writes output file """
-    global errorCode
-
-    if os.path.isfile(inputPath):
-        writeRomDataToFile(getRomData(inputPath))
-    else:
-        if os.path.isdir(inputPath):
-            for root, dirs, files in os.walk(inputPath):
-                for file in files:
-                    writeRomDataToFile(getRomData(os.path.join(root, file)))
+    def generateRomData(self):
+        """ Calls functions to read input and writes output file """
+        if os.path.isfile(self.inputPath):
+            self.__processFile()
+        elif os.path.isdir(self.inputPath):
+            self.__processDirectory()
         else:
-            errorCode = 2
+            print("Invalid file or directory")
 
+    def __processFile(self):
+        """ Calls all methods to  """
+        self.fileData = File(self.inputPath)
+        self.fileData.getHashes()
 
-def getRomData(inputPath):
-    """ Gets rom data with File class """
-    objFile = File(inputPath)
-    objFile.getHashes()
-    return(objFile)
+        self.__getTemplateContent()
+        self.__populateTemplate()
+        self.__writePopulatedTemplate()
 
+    def __processDirectory(self):
+        """  """
+        for root, dirs, files in os.walk(self.inputPath):
+            for file in files:
+                self.inputPath = os.path.join(root, file)
+                self.__processFile()
 
-def writeRomDataToFile(objFile):
-    """ Writes rom data to output file """
-    templateDictionary = {
-        'gameName': objFile.nameNoExtension,
-        'romDescription': objFile.nameNoExtension,
-        'romName': objFile.name,
-        'romSize': objFile.size,
-        'romCrc': objFile.crc32,
-        'romMd5': objFile.md5,
-        'romSha1': objFile.sha1
-        }
+    def __getTemplateContent(self):
+        """ Gets content of template file """
+        fRomTemplate = open(self.romTemplateFile)
+        self.romTemplateContent = string.Template(fRomTemplate.read())
+        fRomTemplate.close()
 
-    # get template file
-    fileRomTemplate = open(os.path.join(scriptPath, 'ClrMamePro_rom_dat.tpl'))
-    templateSrc = string.Template(fileRomTemplate.read())
-    fileRomTemplate.close()
+    def __populateTemplate(self):
+        """ Puts file data inside template """
+        templateDictionary = {
+            'gameName': self.fileData.nameNoExtension,
+            'romDescription': self.fileData.nameNoExtension,
+            'romName': self.fileData.name,
+            'romSize': self.fileData.size,
+            'romCrc': self.fileData.crc32,
+            'romMd5': self.fileData.md5,
+            'romSha1': self.fileData.sha1
+            }
+        self.romTemplatePopulated = (
+            self.romTemplateContent.safe_substitute(templateDictionary)
+            )
 
-    # write to output file template and data
-    templateWithData = templateSrc.safe_substitute(templateDictionary)
-    f = open(objFile.pathAndName + '_romdata', "w")
-    print(templateWithData, file=f)
-    f.close()
+    def __writePopulatedTemplate(self):
+        """ Writes rom data to output file """
+        fOutput = open(self.fileData.pathAndName + '_romdata', "w")
+        print(self.romTemplatePopulated, file=fOutput)
+        fOutput.close()
 
 
 if __name__ == "__main__":
@@ -106,4 +96,8 @@ if __name__ == "__main__":
         print('You must use Python 2,7 or higher')
         sys.exit(2)
 
-    _main()
+    if len(sys.argv) != 2:
+        print("Use: python file2clrdat.py FILE_OR_DIRECTORY")
+    else:
+        file2clrdat = File2clrdat(sys.argv[1])
+        file2clrdat.generateRomData()
