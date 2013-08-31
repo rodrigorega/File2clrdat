@@ -23,10 +23,19 @@ from file import File  # class for get file data (hashes, size, etc)
 
 
 class File2clrdat:
-    """ file2clrdat class """
+    """
+    file2clrdat class
+    """
 
     def __init__(self, inputPath):
-        """ Class initialiser """
+        """
+        Class initialiser
+        
+        Return: None
+        
+        :type inputPath: string
+        :param inputPath: file or directory to work with
+        """
         self.inputPath = inputPath
 
     inputPath = None
@@ -37,7 +46,11 @@ class File2clrdat:
     romTemplatePopulated = None
 
     def generateRomData(self):
-        """ Calls functions to read input and writes output file """
+        """
+        Calls functions to acording if input is file or derectory
+        
+        Return: None
+        """
         if os.path.isfile(self.inputPath):
             self.__processFile()
         elif os.path.isdir(self.inputPath):
@@ -46,7 +59,11 @@ class File2clrdat:
             print("Invalid file or directory")
 
     def __processFile(self):
-        """ Calls all methods to  """
+        """
+        Calls all methods to process a file
+        
+        Return: None
+        """
         self.fileData = File(self.inputPath)
         self.fileData.getHashes()
 
@@ -55,20 +72,32 @@ class File2clrdat:
         self.__writePopulatedTemplate()
 
     def __processDirectory(self):
-        """  """
+        """
+        Calls all methods to process a directory
+
+        Return: None
+        """
         for root, dirs, files in os.walk(self.inputPath):
             for file in files:
                 self.inputPath = os.path.join(root, file)
                 self.__processFile()
 
     def __getTemplateContent(self):
-        """ Gets content of template file """
+        """
+        Gets content of template file
+        
+        Return: None
+        """
         fRomTemplate = open(self.romTemplateFile)
         self.romTemplateContent = string.Template(fRomTemplate.read())
         fRomTemplate.close()
 
     def __populateTemplate(self):
-        """ Puts file data inside template """
+        """
+        Puts file data inside template
+        
+        Return: None
+        """
         templateDictionary = {
             'gameName': self.fileData.nameNoExtension,
             'romDescription': self.fileData.nameNoExtension,
@@ -83,13 +112,22 @@ class File2clrdat:
             )
 
     def __writePopulatedTemplate(self):
-        """ Writes rom data to output file """
+        """
+        Writes rom data to output file
+        
+        Return: None
+        """
         fOutput = open(self.fileData.pathAndName + '_romdata', "w")
         print(self.romTemplatePopulated, file=fOutput)
         fOutput.close()
 
 
 if __name__ == "__main__":
+    """
+    Main
+    
+    Return: None
+    """
     # check Python version
     major, minor, micro, releaselevel, serial = sys.version_info
     if (major, minor) < (2, 7):

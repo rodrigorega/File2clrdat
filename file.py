@@ -12,10 +12,19 @@ import zlib  # neeeded to hash crc32
 
 
 class File():
-    """ File class """
+    """
+    File class
+    """
 
     def __init__(self, pathAndName):
-        """ Class initialiser """
+        """
+        Class initialiser
+        
+        Return: None
+
+        :type inputPath: pathAndName
+        :param inputPath: full path/filename of the source file
+        """
         self.pathAndName = os.path.abspath(pathAndName)
         self.name = os.path.basename(self.pathAndName)
         self.nameNoExtension = os.path.splitext(self.name)[0]
@@ -36,7 +45,11 @@ class File():
     FILE_BLOCK_SIZE_READ = 8192
 
     def getHashes(self):
-        """ Calculates file hashes """
+        """
+        Calculates file hashes
+        
+        Return: None
+        """
         with open(self.pathAndName, 'rb') as openedFile:
             self.crc32 = 0
             self.md5 = hashlib.md5()
