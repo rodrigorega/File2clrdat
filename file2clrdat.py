@@ -53,6 +53,7 @@ class File2clrdat:
         
         Return: None
         """
+        # TODO: Move inputPath initialiser arg to this function
         if os.path.isfile(self.inputPath):
             self.__processFile()
         elif os.path.isdir(self.inputPath):
