@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
 This Python script generates "line rom" info from a file or files in a dir.
 This info can be added manually to a ClrMamePro .dat.
@@ -114,7 +116,7 @@ class File2clrdat:
     def __writePopulatedTemplate(self):
         """
         Writes rom data to output file
-        
+
         Return: None
         """
         fOutput = open(self.fileData.pathAndName + '_romdata', "w")
