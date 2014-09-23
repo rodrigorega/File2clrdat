@@ -3,6 +3,9 @@ TODO:
 - Check if utf8 is working with filenames.
 - Add to output filename creation date-time.
 - Configurable output file filename.
+- Verbose output to console.
+- Output messages to log file.
+- Option to configure via configuration file.
 
 DONE:
 - Process all files in a given directory.
