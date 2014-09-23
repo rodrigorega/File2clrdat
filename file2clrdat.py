@@ -110,7 +110,7 @@ class File2clrdat:
                 self.__printMatchFoundInDatFile(self.inputPath, romFoundInDatFile)
                 confirm = self.__userConfirm('Do you want to generate romdata file anyway? (y or n)')
                 if confirm != True:
-                    print('Exiting...')
+                    print('Ignoring file...')
                     return
 
         self.__getTemplateContent()
