@@ -1,9 +1,22 @@
-﻿I use this script to speed up the process of update ClrMamePro .dat files,
-without using ClrMamePro. Generates one file with rom data from a sngle file.
-This data can be merged in a existing .dat file by hand.
+﻿file2clrdat.py: Outputs a file in ClrMamePro dat format with rom info (hashes,
+size...) from a file or files in a directory. This will speed up the process
+of update ClrMamePro .dat files, without using ClrMamePro.
+
+Usage:
+  file2clrdat.py INPUT_ROM [-d DAT_FILE]
+  file2clrdat.py --help
+
+Arguments:
+  INPUT_ROM                           Input rom file o directory with rom files
+
+Options:
+  -d DAT_FILE, --datfile=DAT_FILE     Search INPUT_ROM md5 hash in a
+                                      ClrMamePro dat file and notify on match
+  -h, --help                          Show this help screen.
+
+Output:
+  INPUT_ROM_romdata, File with all info from INPUT_ROM
+  
 
 Author: Rodrigo Rega <contacto@rodrigorega.es>
 License: CC-BY-SA 3.0 license (http://creativecommons.org/licenses/by/3.0/
-
-Use: file2clrdat filename.rom
-Output: filename.rom_romdata
