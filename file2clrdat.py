@@ -106,20 +106,16 @@ class File2clrdat:
         
         if self.datFilePath:
             romFoundInDatFile = self.searchInDatFile('md5', self.fileData.md5)
-            self.__printMatchFoundInDatFile(self.inputPath, romFoundInDatFile)
-            confirm = self.__userConfirm('Do you want to generate romdata file anyway? (y or n)')
-            if confirm:
-                self.__getTemplateContent()
-                self.__populateTemplate()
-                self.__writePopulatedTemplate()
-            else:
-                print('Exiting...')
-                return
-        else:
-            # TODO: I dont like this, it is duplicated with previous if...
-            self.__getTemplateContent()
-            self.__populateTemplate()
-            self.__writePopulatedTemplate()
+            if romFoundInDatFile:
+                self.__printMatchFoundInDatFile(self.inputPath, romFoundInDatFile)
+                confirm = self.__userConfirm('Do you want to generate romdata file anyway? (y or n)')
+                if confirm != True:
+                    print('Exiting...')
+                    return
+
+        self.__getTemplateContent()
+        self.__populateTemplate()
+        self.__writePopulatedTemplate()
     
     def __userConfirm(self, confirmMsg):
         """get user confirmation to proceed"""
