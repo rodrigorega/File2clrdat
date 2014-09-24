@@ -37,9 +37,8 @@ import string  # needed for templating
 import os  # needed for file and path manipulations
 from file import File  # class for get file data (hashes, size, etc)
 
-from lxml import etree, objectify # for parsinge dat file
-import urllib
-import pprint
+from lxml import objectify # for parsinge dat file
+
 
 class File2clrdat(object):
     """
