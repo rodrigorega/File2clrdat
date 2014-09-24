@@ -1,18 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
-#  file.py
-#
-# Author: Rodrigo Rega <contacto@rodrigorega.es>
-# License: CC-BY-SA 3.0 license (http://creativecommons.org/licenses/by/3.0/
-#
+
+"""
+
+file.py
+
+Author: Rodrigo Rega <contacto@rodrigorega.es>
+License: CC-BY-SA 3.0 license (http://creativecommons.org/licenses/by/3.0/
+
+"""
 
 import os
 import hashlib  # needed to hash md5 and sha1
 import zlib  # neeeded to hash crc32
 
 
-class File():
+class File(object):
     """
     File class
     """
@@ -20,7 +23,7 @@ class File():
     def __init__(self, pathAndName):
         """
         Class initialiser
-        
+
         Return: None
 
         :type inputPath: pathAndName
@@ -48,7 +51,7 @@ class File():
     def getHashes(self):
         """
         Calculates file hashes
-        
+
         Return: None
         """
         with open(self.pathAndName, 'rb') as openedFile:
