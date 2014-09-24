@@ -7,13 +7,17 @@ size...) from a file or files in a directory. This will speed up the process
 of update ClrMamePro .dat files, without using ClrMamePro.
 
 Usage:
-  file2clrdat.py INPUT_ROM [-d DAT_FILE]
+  file2clrdat.py INPUT_ROM [(-s SEARCH_TYPE -d DAT_FILE)]
   file2clrdat.py --help
 
 Arguments:
   INPUT_ROM                           Input rom file o directory with rom files
 
 Options:
+  -s SEARCH_TYPE, --searchtype=type   Search inside a dat file for a type of
+                                      value wich match with INPUT_ROM, accepted
+                                      type" values: size, crc32, md5, sha1
+                                      Must be used with "-d" option.
   -d DAT_FILE, --datfile=DAT_FILE     Search INPUT_ROM md5 hash in a
                                       ClrMamePro dat file and notify on match
   -h, --help                          Show this help screen.
@@ -41,7 +45,7 @@ class File2clrdat:
     file2clrdat class
     """
 
-    def __init__(self, inputPath, datFilePath):
+    def __init__(self, inputPath, datFilePath, search_type):
         """
         Class initialiser
         
@@ -52,13 +56,19 @@ class File2clrdat:
         
         :type datFilePath: string
         :param datFilePath: work dat file
+        
+        :type search_type: string
+        :param search_type: value that will be searched in dat file
         """
         self.inputPath = inputPath
         self.datFilePath = datFilePath
+        self.search_type = search_type
 
     inputPath = None
+    search_type = None
     datFilePath = None
     fileData = None
+    validSearchTypes = ['size', 'md5', 'crc32', 'sha1']
     SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
     romTemplateFile = os.path.join(SCRIPT_PATH, 'ClrMamePro_rom_dat.tpl')
     romTemplateContent = None
@@ -84,6 +94,10 @@ class File2clrdat:
 
         Return: If content was found, returns filename
         """
+        
+        if search_type == "crc32":
+            search_type = "crc" # I need this to match with File class
+            
         with open(self.datFilePath) as f_xml:
             xml_data = f_xml.read()
 
@@ -105,7 +119,7 @@ class File2clrdat:
         self.fileData.getHashes()
         
         if self.datFilePath:
-            romFoundInDatFile = self.searchInDatFile('md5', self.fileData.md5)
+            romFoundInDatFile = self.searchInDatFile(self.search_type, getattr(self.fileData, self.search_type))
             if romFoundInDatFile:
                 self.__printMatchFoundInDatFile(self.inputPath, romFoundInDatFile)
                 confirm = self.__userConfirm('Do you want to generate romdata file anyway? (y or n)')
@@ -128,7 +142,7 @@ class File2clrdat:
             return self.__userConfirm(confirmMsg)
         
     def __printMatchFoundInDatFile(self, inputRomFile, datFile):
-        """ Print msg fom found """
+        """ Print found match msg """
         
         message = """
         Input rom file found in provided dat file:
@@ -215,5 +229,8 @@ if __name__ == "__main__":
         
     args = docopt(__doc__, version='1.0.0rc2')
     
-    file2clrdat = File2clrdat(args['INPUT_ROM'],args['--datfile'])
-    file2clrdat.generateRomData()
+    file2clrdat = File2clrdat(args['INPUT_ROM'], args['--datfile'], args['--searchtype'])
+    if args['--searchtype'] in file2clrdat.validSearchTypes:
+        file2clrdat.generateRomData()
+    else:
+        print('- %s is not a valid search type. Use --help to more info.' % args['--searchtype'])
