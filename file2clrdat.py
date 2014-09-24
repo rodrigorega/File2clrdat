@@ -119,10 +119,13 @@ class File2clrdat(object):
         self.fileData.getHashes()
 
         if self.datFilePath:
-            romFoundInDatFile = self.searchInDatFile(self.search_type, getattr(self.fileData, self.search_type))
+            romFoundInDatFile = self.searchInDatFile(
+                self.search_type, getattr(self.fileData, self.search_type))
             if romFoundInDatFile:
-                self.__printMatchFoundInDatFile(self.inputPath, romFoundInDatFile)
-                confirm = self.__userConfirm('Do you want to generate romdata file anyway? (y or n)')
+                self.__printMatchFoundInDatFile(
+                    self.inputPath, romFoundInDatFile)
+                confirm = self.__userConfirm(
+                    'Do you want to generate romdata file anyway? (y or n)')
                 if confirm != True:
                     print('Ignoring file...')
                     return
@@ -229,8 +232,10 @@ if __name__ == "__main__":
 
     ARGS = docopt(__doc__, version='1.0.0rc2')
 
-    file2clrdat = File2clrdat(ARGS['INPUT_ROM'], ARGS['--datfile'], ARGS['--searchtype'])
+    file2clrdat = File2clrdat(
+        ARGS['INPUT_ROM'], ARGS['--datfile'], ARGS['--searchtype'])
     if ARGS['--searchtype'] in file2clrdat.validSearchTypes:
         file2clrdat.generateRomData()
     else:
-        print('- %s is not a valid search type. Use --help to more info.' % ARGS['--searchtype'])
+        print('- %s is not a valid search type. Use --help to more info.'
+            % ARGS['--searchtype'])
