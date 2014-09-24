@@ -3,13 +3,17 @@ size...) from a file or files in a directory. This will speed up the process
 of update ClrMamePro .dat files, without using ClrMamePro.
 
 Usage:
-  file2clrdat.py INPUT_ROM [-d DAT_FILE]
+  file2clrdat.py INPUT_ROM [(-s SEARCH_TYPE -d DAT_FILE)]
   file2clrdat.py --help
 
 Arguments:
   INPUT_ROM                           Input rom file o directory with rom files
 
 Options:
+  -s SEARCH_TYPE, --searchtype=type   Search inside a dat file for a type of
+                                      value wich match with INPUT_ROM. Accepted
+                                      "type" values: size, crc32, md5, sha1
+                                      Must be used with "-d" option.
   -d DAT_FILE, --datfile=DAT_FILE     Search INPUT_ROM md5 hash in a
                                       ClrMamePro dat file and notify on match
   -h, --help                          Show this help screen.

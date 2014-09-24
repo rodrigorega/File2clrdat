@@ -15,8 +15,8 @@ Arguments:
 
 Options:
   -s SEARCH_TYPE, --searchtype=type   Search inside a dat file for a type of
-                                      value wich match with INPUT_ROM, accepted
-                                      type" values: size, crc32, md5, sha1
+                                      value wich match with INPUT_ROM. Accepted
+                                      "type" values: size, crc32, md5, sha1
                                       Must be used with "-d" option.
   -d DAT_FILE, --datfile=DAT_FILE     Search INPUT_ROM md5 hash in a
                                       ClrMamePro dat file and notify on match
