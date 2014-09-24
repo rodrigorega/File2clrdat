@@ -25,7 +25,7 @@ Options:
 
 Output:
   INPUT_ROM_romdata, File with all info from INPUT_ROM
-  
+
 
 Author: Rodrigo Rega <contacto@rodrigorega.es>
 License: CC-BY-SA 3.0 license (http://creativecommons.org/licenses/by/3.0/
@@ -41,7 +41,7 @@ from lxml import etree, objectify # for parsinge dat file
 import urllib
 import pprint
 
-class File2clrdat:
+class File2clrdat(object):
     """
     file2clrdat class
     """
@@ -49,15 +49,15 @@ class File2clrdat:
     def __init__(self, inputPath, datFilePath, search_type):
         """
         Class initialiser
-        
+
         Return: None
-        
+
         :type inputPath: string
         :param inputPath: file or directory to work with
-        
+
         :type datFilePath: string
         :param datFilePath: work dat file
-        
+
         :type search_type: string
         :param search_type: value that will be searched in dat file
         """
@@ -78,7 +78,7 @@ class File2clrdat:
     def generateRomData(self):
         """
         Calls functions to acording if input is file or derectory
-        
+
         Return: None
         """
         # TODO: Move inputPath initialiser arg to this function
@@ -88,22 +88,22 @@ class File2clrdat:
             self.__processDirectory()
         else:
             print("Invalid file or directory")
-            
+
     def searchInDatFile(self, search_type, search_content):
         """
         Checks if a given content is insde dat file
 
         Return: If content was found, returns filename
         """
-        
+
         if search_type == "crc32":
             search_type = "crc" # I need this to match with File class
-            
+
         with open(self.datFilePath) as f_xml:
             xml_data = f_xml.read()
 
         datafile = objectify.fromstring(xml_data)
-        
+
         # loop over elements and print their tags and text
         for games in datafile.getchildren():
             for game in games.getchildren():
@@ -113,12 +113,12 @@ class File2clrdat:
     def __processFile(self):
         """
         Calls all methods to process a file
-        
+
         Return: None
         """
         self.fileData = File(self.inputPath)
         self.fileData.getHashes()
-        
+
         if self.datFilePath:
             romFoundInDatFile = self.searchInDatFile(self.search_type, getattr(self.fileData, self.search_type))
             if romFoundInDatFile:
@@ -131,20 +131,20 @@ class File2clrdat:
         self.__getTemplateContent()
         self.__populateTemplate()
         self.__writePopulatedTemplate()
-    
+
     def __userConfirm(self, confirmMsg):
         """get user confirmation to proceed"""
-        userChoice = raw_input(confirmMsg)        
+        userChoice = raw_input(confirmMsg)
         if userChoice == 'y':
             return True
         elif userChoice == 'n':
             return False
         else:
             return self.__userConfirm(confirmMsg)
-        
+
     def __printMatchFoundInDatFile(self, inputRomFile, datFile):
         """ Print found match msg """
-        
+
         message = """
         Input rom file found in provided dat file:
         - Input rom file: %s
@@ -161,14 +161,14 @@ class File2clrdat:
         Return: None
         """
         for root, dirs, files in os.walk(self.inputPath):
-            for file in files:
-                self.inputPath = os.path.join(root, file)
+            for thisfile in files:
+                self.inputPath = os.path.join(root, thisfile)
                 self.__processFile()
 
     def __getTemplateContent(self):
         """
         Gets content of template file
-        
+
         Return: None
         """
         fRomTemplate = open(self.romTemplateFile)
@@ -178,7 +178,7 @@ class File2clrdat:
     def __populateTemplate(self):
         """
         Puts file data inside template
-        
+
         Return: None
         """
         templateDictionary = {
@@ -208,12 +208,12 @@ class File2clrdat:
 if __name__ == "__main__":
     """
     Main
-    
+
     Return: None
     """
     # check Python version
-    major, minor, micro, releaselevel, serial = sys.version_info
-    if (major, minor) < (2, 7):
+    MAJOR, MINOR, MICRO, RELEASELEVEL, SERIAL = sys.version_info
+    if (MAJOR, MINOR) < (2, 7):
         print('You must use Python 2,7 or higher')
         sys.exit(2)
 
@@ -227,11 +227,11 @@ if __name__ == "__main__":
         https://github.com/docopt/docopt
         """)
         raise
-        
-    args = docopt(__doc__, version='1.0.0rc2')
-    
-    file2clrdat = File2clrdat(args['INPUT_ROM'], args['--datfile'], args['--searchtype'])
-    if args['--searchtype'] in file2clrdat.validSearchTypes:
+
+    ARGS = docopt(__doc__, version='1.0.0rc2')
+
+    file2clrdat = File2clrdat(ARGS['INPUT_ROM'], ARGS['--datfile'], ARGS['--searchtype'])
+    if ARGS['--searchtype'] in file2clrdat.validSearchTypes:
         file2clrdat.generateRomData()
     else:
-        print('- %s is not a valid search type. Use --help to more info.' % args['--searchtype'])
+        print('- %s is not a valid search type. Use --help to more info.' % ARGS['--searchtype'])
