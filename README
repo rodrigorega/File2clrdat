@@ -3,6 +3,7 @@ size...) from a file or files in a directory. This will speed up the process
 of update ClrMamePro .dat files, without using ClrMamePro.
 
 Usage:
+  file2clrdat.py INPUT_ROM
   file2clrdat.py INPUT_ROM [(-s SEARCH_TYPE -d DAT_FILE)]
   file2clrdat.py --help
 
