@@ -67,9 +67,9 @@ class File2clrdat(object):
     search_type = None
     datfile_path = None
     file_data = None
-    validSearchTypes = ['size', 'md5', 'crc32', 'sha1']
+    VALID_SEARCH_TYPES = ['size', 'md5', 'crc32', 'sha1']
     SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
-    romTemplateFile = os.path.join(SCRIPT_PATH, 'ClrMamePro_rom_dat.tpl')
+    rom_template_file = os.path.join(SCRIPT_PATH, 'ClrMamePro_rom_dat.tpl')
     rom_template_content = None
     rom_template_populated = None
 
@@ -190,7 +190,7 @@ class File2clrdat(object):
 
         Return: None
         """
-        f_rom_template = open(self.romTemplateFile)
+        f_rom_template = open(self.rom_template_file)
         self.rom_template_content = string.Template(f_rom_template.read())
         f_rom_template.close()
 
@@ -219,7 +219,7 @@ class File2clrdat(object):
 
         Return: None
         """
-        f_output = open(self.file_data.pathAndName + '_romdata', "w")
+        f_output = open(self.file_data.path_and_name + '_romdata', "w")
         print(self.rom_template_populated, file=f_output)
         f_output.close()
 
@@ -249,10 +249,10 @@ if __name__ == "__main__":
 
     ARGS = docopt(__doc__, version='1.0.0rc2')
 
-    my_file2clrdat = File2clrdat(
+    MY_FILE2CLRDAT = File2clrdat(
         ARGS['INPUT_ROM'], ARGS['--datfile'], ARGS['--searchtype'])
-    if ARGS['--searchtype'] in my_file2clrdat.validSearchTypes:
-        my_file2clrdat.generate_rom_data()
+    if ARGS['--searchtype'] in MY_FILE2CLRDAT.VALID_SEARCH_TYPES:
+        MY_FILE2CLRDAT.generate_rom_data()
     else:
         print('- %s is not a valid search type. Use --help to more info.'
               % ARGS['--searchtype'])
