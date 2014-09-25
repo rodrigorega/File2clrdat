@@ -8,24 +8,37 @@ of update ClrMamePro .dat files, without using ClrMamePro.
 
 Usage:
   file2clrdat.py INPUT_ROM
-  file2clrdat.py INPUT_ROM [(-s SEARCH_TYPE -d DAT_FILE)]
+  file2clrdat.py INPUT_ROM [(-s SEARCH_TYPE -d DAT_FILE)] [-m DIR] [-u DIR]
   file2clrdat.py --help
 
 Arguments:
-  INPUT_ROM                           Input rom file o directory with rom files
+  INPUT_ROM                            Input rom file o directory with roms.
 
 Options:
-  -s SEARCH_TYPE, --searchtype=type   Search inside a dat file for a type of
-                                      value wich match with INPUT_ROM. Accepted
-                                      "type" values: size, crc, md5, sha1
-                                      Must be used with "-d" option.
-  -d DAT_FILE, --datfile=DAT_FILE     Search INPUT_ROM md5 hash in a
-                                      ClrMamePro dat file and notify on match
-  -h, --help                          Show this help screen.
+  -s SEARCH_TYPE, --searchtype=type    Search inside a dat file for a type of
+                                       value to match with INPUT_ROM. Accepted
+                                       "type" values: size, crc, md5, sha1
+                                       Must be used with "-d" option.
+  -d DAT_FILE, --datfile=DAT_FILE      Search INPUT_ROM md5 hash in a
+                                       ClrMamePro dat file and notify on match
+  -m MATCHED_DIR, --matcheddir=DIR     INPUT_ROM will be moved to MATCHED_DIR
+                                       if exists in DAT_FILE (-d option).
+  -u UNMATCHED_DIR --unmatcheddir=DIR  INPUT_ROM will be moved to UNMATCHED_DIR
+                                       if not exists in DAT_FILE (-d option).
+  -h, --help                           Show this help screen.
 
 Output:
   INPUT_ROM_romdata, File with all info from INPUT_ROM
 
+Examples:
+  - Generate rom info (rom.bin_rondata) from a single rom file:
+      file2clrdat.py "c:\my_downloads\rom.bin"
+
+  - Scan a directory, match sha1 hashes of every file in that directory with
+    a dat file, matched files will be moved to "dupe_roms" directory, files not
+    found in dat file will be moved to "new_roms" directory adding a file with
+    rom data for every file:
+      file2clrdat.py "c:\my_downloaded_roms" -s sha1 -d "c:\my_dat_wip\my_dat.dat" -m "c:\my_dat_wip\dupe_roms" -u "c:\my_dat_wip\new_roms"
 
 Author: Rodrigo Rega <contacto@rodrigorega.es>
 License: CC-BY-SA 3.0 license (http://creativecommons.org/licenses/by/3.0/
@@ -36,7 +49,7 @@ import sys  # needed for get python version and argv
 import string  # needed for templating
 import os  # needed for file and path manipulations
 from file import File  # class for get file data (hashes, size, etc)
-from lxml import objectify  # for parsinge dat file
+from lxml import objectify  # for parsing dat file
 
 
 class File2clrdat(object):
@@ -44,9 +57,10 @@ class File2clrdat(object):
     file2clrdat class
     """
 
-    def __init__(self, input_path, datfile_path, search_type):
+    def __init__(self, input_path, datfile_path,
+                 search_type, matched_dir, unmatched_dir):
         """
-        Class initialiser
+        Class initializer
 
         Return: None
 
@@ -62,10 +76,14 @@ class File2clrdat(object):
         self.input_path = input_path
         self.datfile_path = datfile_path
         self.search_type = search_type
+        self.matched_dir = matched_dir
+        self.unmatched_dir = unmatched_dir
 
     input_path = None
     search_type = None
     datfile_path = None
+    matched_dir = None
+    unmatched_dir = None
     file_data = None
     VALID_SEARCH_TYPES = ['size', 'md5', 'crc', 'sha1']
     SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -75,11 +93,11 @@ class File2clrdat(object):
 
     def generate_rom_data(self):
         """
-        Calls functions to acording if input is file or derectory
+        Calls functions to according if input is file or directory
 
         Return: None
         """
-        # TODO: Move input_path initialiser arg to this function
+        # TODO: Move input_path initializer arg to this function
         if os.path.isfile(self.input_path):
             self.__process_file()
         elif os.path.isdir(self.input_path):
@@ -89,7 +107,7 @@ class File2clrdat(object):
 
     def search_in_datfile(self, search_type, search_content):
         """
-        Checks if a given content is insde dat file
+        Checks if a given content is inside dat file
 
         Return: If content was found, returns filename
 
@@ -123,39 +141,38 @@ class File2clrdat(object):
             rom_found_in_datfile = self.search_in_datfile(
                 self.search_type, getattr(self.file_data, self.search_type))
             if rom_found_in_datfile:
-                self.__print_match_found_in_datfile(
-                    self.input_path, rom_found_in_datfile)
-                confirm = self.__user_confirm(
-                    'Do you want to generate romdata file anyway? (y or n)')
-                if confirm is not True:
-                    print('Ignoring file...')
-                    return
+                self.__print_match_found_in_datfile(rom_found_in_datfile)
+                if self.matched_dir:
+                    self._move_file(self.matched_dir)
+            else:
+                if self.unmatched_dir:
+                    self._move_file(self.unmatched_dir)
 
-        self.__get_template_content()
-        self.__populate_template()
-        self.__write_populated_template()
+                self.__get_template_content()
+                self.__populate_template()
+                self.__write_populated_template()
 
-    def __user_confirm(self, confirm_msg):
+    def _move_file(self, destination_dir):
         """
-        Get user confirmation to proceed
+        Move rom file to a given directory. If exists it will be renamed.
 
-        Return: True if user confirmed, False if not
+        Return: None
 
-        :type confirm_msg: string
-        :param confirm_msg: Message that will be show to user
+        :type destination_dir: string
+        :param destination_dir: Directory where file will be moved
         """
-        user_choice = raw_input(confirm_msg)
-        if user_choice == 'y':
-            return True
-        elif user_choice == 'n':
-            return False
-        else:
-            return self.__user_confirm(confirm_msg)
+        destination_file = os.path.join(destination_dir, self.file_data.name)
+        count = 0
+        while os.path.exists(destination_file):
+            count += 1
+            destination_file = os.path.join(destination_dir, '%s (%d) %s' %
+                                            (self.file_data.nameNoExtension,
+                                             count, self.file_data.extension))
+        os.rename(self.input_path, destination_file)
 
-    def __print_match_found_in_datfile(self, input_romfile,
-                                       rom_found_in_datfile):
+    def __print_match_found_in_datfile(self, rom_found_in_datfile):
         """
-        Print found match msg
+        Print found match message
 
         Return: None
 
@@ -169,7 +186,7 @@ class File2clrdat(object):
         Input rom file found in provided dat file:
         - Input rom file: %s
         - Rom name in dat: %s
-        """ % (input_romfile, rom_found_in_datfile)
+        """ % (self.input_path, rom_found_in_datfile)
 
         print(message)
 
@@ -219,7 +236,13 @@ class File2clrdat(object):
 
         Return: None
         """
-        f_output = open(self.file_data.path_and_name + '_romdata', "w")
+        if self.unmatched_dir:
+            dst_dir = self.unmatched_dir
+        else:
+            dst_dir = self.file_data.path
+
+        romdata_file = os.path.join(dst_dir, self.file_data.name + '_romdata')
+        f_output = open(romdata_file, "w")
         print(self.rom_template_populated, file=f_output)
         f_output.close()
 
@@ -249,7 +272,8 @@ if __name__ == "__main__":
 
     ARGS = docopt(__doc__, version='1.0.0rc2')
     MY_FILE2CLRDAT = File2clrdat(
-        ARGS['INPUT_ROM'], ARGS['--datfile'], ARGS['--searchtype'])
+        ARGS['INPUT_ROM'], ARGS['--datfile'], ARGS['--searchtype'],
+        ARGS['--matcheddir'], ARGS['--unmatcheddir'])
 
     if ARGS['--searchtype'] in MY_FILE2CLRDAT.VALID_SEARCH_TYPES:
         MY_FILE2CLRDAT.generate_rom_data()
