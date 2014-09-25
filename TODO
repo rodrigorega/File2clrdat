@@ -8,7 +8,10 @@ TODO:
 - Option to configure via configuration file.
 - Verify if match directories exists, maybe create them.
 - Add date to renamed files.
+- If recursive is selected verify, -m and -u folders to avoid problems.
+- Add option to copy files instead move them.
 
 DONE:
 - Process all files in a given directory.
 - Find hashes in a pre-existing .dat file.
+- Verify input dir. and output dir. are not the same.
