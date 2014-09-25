@@ -31,13 +31,14 @@ class File(object):
         """
         self.path_and_name = os.path.abspath(path_and_name)
         self.name = os.path.basename(self.path_and_name)
-        self.nameNoExtension = os.path.splitext(self.name)[0]
+        self.nameNoExtension, self.extension = os.path.splitext(self.name)
         self.path = os.path.dirname(self.path_and_name)
         # size needs to be converted to str...
         self.size = str(os.path.getsize(self.path_and_name))
 
     name = None
     nameNoExtension = None
+    extension = None
     path = None
     path_and_name = None
     size = None
