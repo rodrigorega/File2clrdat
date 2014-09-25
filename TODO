@@ -6,6 +6,8 @@ TODO:
 - Verbose output to console.
 - Output messages to log file.
 - Option to configure via configuration file.
+- Verify if match directories exists, maybe create them.
+- Add date to renamed files.
 
 DONE:
 - Process all files in a given directory.
