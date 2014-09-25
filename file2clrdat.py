@@ -8,7 +8,7 @@ of update ClrMamePro .dat files, without using ClrMamePro.
 
 Usage:
   file2clrdat.py INPUT_ROM
-  file2clrdat.py INPUT_ROM [(-s SEARCH_TYPE -d DAT_FILE)] [-m DIR] [-u DIR]
+  file2clrdat.py INPUT_ROM [(-s SEARCH_TYPE -d DAT_FILE) [-m DIR] [-u DIR]]
   file2clrdat.py --help
 
 Arguments:
@@ -22,9 +22,11 @@ Options:
   -d DAT_FILE, --datfile=DAT_FILE      Search INPUT_ROM md5 hash in a
                                        ClrMamePro dat file and notify on match
   -m MATCHED_DIR, --matcheddir=DIR     INPUT_ROM will be moved to MATCHED_DIR
-                                       if exists in DAT_FILE (-d option).
+                                       if exists in DAT_FILE.
+                                       Must be used with "-sd" options.
   -u UNMATCHED_DIR --unmatcheddir=DIR  INPUT_ROM will be moved to UNMATCHED_DIR
-                                       if not exists in DAT_FILE (-d option).
+                                       if not exists in DAT_FILE.
+                                       Must be used with "-sd" options.
   -h, --help                           Show this help screen.
 
 Output:
