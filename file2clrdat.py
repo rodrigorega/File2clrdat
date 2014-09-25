@@ -31,6 +31,7 @@ Options:
 
 Output:
   INPUT_ROM_romdata, File with all info from INPUT_ROM
+  Optional: Move scanned roms to folders.
 
 Examples:
   - Generate rom info (rom.bin_rondata) from a single rom file:
@@ -281,8 +282,7 @@ if __name__ == "__main__":
         print ("""
         Please install docopt using:
             pip install docopt
-        For more refer to:
-        https://github.com/docopt/docopt
+        For more info refer to: https://github.com/docopt/docopt
         """)
         raise
 
@@ -290,6 +290,11 @@ if __name__ == "__main__":
     MY_FILE2CLRDAT = File2clrdat(
         ARGS['INPUT_ROM'], ARGS['--datfile'], ARGS['--searchtype'],
         ARGS['--matcheddir'], ARGS['--unmatcheddir'])
+
+    if ARGS['--matcheddir'] and ARGS['--unmatcheddir']:
+        if ARGS['--matcheddir'] == ARGS['--unmatcheddir']:
+            print ('MATCHED_DIR and UNMATCHED_DIR must be different.')
+            sys.exit(3)
 
     if ARGS['--searchtype'] in MY_FILE2CLRDAT.VALID_SEARCH_TYPES:
         MY_FILE2CLRDAT.generate_rom_data()

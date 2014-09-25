@@ -27,6 +27,7 @@ Options:
 
 Output:
   INPUT_ROM_romdata, File with all info from INPUT_ROM
+  Optional: Move scanned roms to folders.
 
 Examples:
   - Generate rom info (rom.bin_rondata) from a single rom file:
