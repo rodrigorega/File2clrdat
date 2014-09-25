@@ -43,7 +43,7 @@ class File(object):
     size = None
     creationTime = None
     modificationTime = None
-    crc32 = None
+    crc = None
     md5 = None
     sha1 = None
     FILE_BLOCK_SIZE_READ = 8192
@@ -55,7 +55,7 @@ class File(object):
         Return: None
         """
         with open(self.path_and_name, 'rb') as openedFile:
-            self.crc32 = 0
+            self.crc = 0
             self.md5 = hashlib.md5()
             self.sha1 = hashlib.sha1()
 
@@ -64,10 +64,10 @@ class File(object):
             while data:  # if there is data in chunk, process it
                 self.md5.update(data)
                 self.sha1.update(data)
-                self.crc32 = zlib.crc32(data, self.crc32)
+                self.crc = zlib.crc32(data, self.crc)
                 # read next chunk from file
                 data = openedFile.read(self.FILE_BLOCK_SIZE_READ)
-            self.crc32 = "%X" % (self.crc32 & 0xFFFFFFFF)
-            self.crc32 = self.crc32.lower()
+            self.crc = "%X" % (self.crc & 0xFFFFFFFF)
+            self.crc = self.crc.lower()
             self.md5 = self.md5.hexdigest()
             self.sha1 = self.sha1.hexdigest()

@@ -17,7 +17,7 @@ Arguments:
 Options:
   -s SEARCH_TYPE, --searchtype=type   Search inside a dat file for a type of
                                       value wich match with INPUT_ROM. Accepted
-                                      "type" values: size, crc32, md5, sha1
+                                      "type" values: size, crc, md5, sha1
                                       Must be used with "-d" option.
   -d DAT_FILE, --datfile=DAT_FILE     Search INPUT_ROM md5 hash in a
                                       ClrMamePro dat file and notify on match
@@ -67,7 +67,7 @@ class File2clrdat(object):
     search_type = None
     datfile_path = None
     file_data = None
-    VALID_SEARCH_TYPES = ['size', 'md5', 'crc32', 'sha1']
+    VALID_SEARCH_TYPES = ['size', 'md5', 'crc', 'sha1']
     SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
     rom_template_file = os.path.join(SCRIPT_PATH, 'ClrMamePro_rom_dat.tpl')
     rom_template_content = None
@@ -99,9 +99,6 @@ class File2clrdat(object):
         :type search_content: string
         :param search_content: Content that will be matched
         """
-        if search_type == "crc32":
-            search_type = "crc"  # I need this to match with File class
-
         with open(self.datfile_path) as f_xml:
             xml_data = f_xml.read()
 
@@ -143,6 +140,9 @@ class File2clrdat(object):
         Get user confirmation to proceed
 
         Return: True if user confirmed, False if not
+
+        :type confirm_msg: string
+        :param confirm_msg: Message that will be show to user
         """
         user_choice = raw_input(confirm_msg)
         if user_choice == 'y':
@@ -205,7 +205,7 @@ class File2clrdat(object):
             'romDescription': self.file_data.nameNoExtension,
             'romName': self.file_data.name,
             'romSize': self.file_data.size,
-            'romCrc': self.file_data.crc32,
+            'romCrc': self.file_data.crc,
             'romMd5': self.file_data.md5,
             'romSha1': self.file_data.sha1
             }
@@ -248,9 +248,9 @@ if __name__ == "__main__":
         raise
 
     ARGS = docopt(__doc__, version='1.0.0rc2')
-
     MY_FILE2CLRDAT = File2clrdat(
         ARGS['INPUT_ROM'], ARGS['--datfile'], ARGS['--searchtype'])
+
     if ARGS['--searchtype'] in MY_FILE2CLRDAT.VALID_SEARCH_TYPES:
         MY_FILE2CLRDAT.generate_rom_data()
     else:
