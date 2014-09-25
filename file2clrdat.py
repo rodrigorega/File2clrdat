@@ -19,7 +19,7 @@ Options:
                                        value to match with INPUT_ROM. Accepted
                                        "type" values: size, crc, md5, sha1
                                        Must be used with "-d" option.
-  -d DAT_FILE, --datfile=DAT_FILE      File that will be searched, type of 
+  -d DAT_FILE, --datfile=DAT_FILE      File that will be searched, type of
                                        search is given with "-s" option.
                                        Must be used with "-s" option.
   -m MATCHED_DIR, --matcheddir=DIR     INPUT_ROM will be moved to MATCHED_DIR
@@ -265,17 +265,24 @@ class File2clrdat(object):
         f_output.close()
 
 
+def _validate_python_version():
+    '''
+    Check Python version
+
+    Return: None
+    '''
+    MAJOR, MINOR, MICRO, RELEASELEVEL, SERIAL = sys.version_info
+    if (MAJOR, MINOR) < (2, 7):
+        print('You must use Python 2,7 or higher')
+        sys.exit(2)
+
 if __name__ == "__main__":
     """
     Main
 
     Return: None
     """
-    # check Python version
-    MAJOR, MINOR, MICRO, RELEASELEVEL, SERIAL = sys.version_info
-    if (MAJOR, MINOR) < (2, 7):
-        print('You must use Python 2,7 or higher')
-        sys.exit(2)
+    _validate_python_version()
 
     try:
         from docopt import docopt
