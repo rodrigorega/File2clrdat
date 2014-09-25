@@ -12,7 +12,7 @@ License: CC-BY-SA 3.0 license (http://creativecommons.org/licenses/by/3.0/
 
 import os
 import hashlib  # needed to hash md5 and sha1
-import zlib  # neeeded to hash crc32
+import zlib  # needed to hash crc32
 
 
 class File(object):
@@ -22,7 +22,7 @@ class File(object):
 
     def __init__(self, path_and_name):
         """
-        Class initialiser
+        Class initializer
 
         Return: None
 
