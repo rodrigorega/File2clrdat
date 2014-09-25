@@ -190,15 +190,29 @@ class File2clrdat(object):
 
         print(message)
 
-    def __process_directory(self):
+    def __process_directory_recursive(self):
         """
-        Calls all methods to process a directory
+        Calls all methods to process a directory and all subdirectories
 
         Return: None
         """
         for root, dirs, files in os.walk(self.input_path):
             for thisfile in files:
                 self.input_path = os.path.join(root, thisfile)
+                self.__process_file()
+
+    def __process_directory(self):
+        """
+        Calls all methods to process a directory
+
+        Return: None
+        """
+        path = self.input_path
+
+        for thisfile in os.listdir(path):
+            path_and_file = os.path.join(path, thisfile)
+            if os.path.isfile(path_and_file):
+                self.input_path = path_and_file
                 self.__process_file()
 
     def __get_template_content(self):
