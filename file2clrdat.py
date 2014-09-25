@@ -8,7 +8,7 @@ of update ClrMamePro .dat files, without using ClrMamePro.
 
 Usage:
   file2clrdat.py INPUT_ROM
-  file2clrdat.py INPUT_ROM [(-s SEARCH_TYPE -d DAT_FILE) [-m DIR] [-u DIR]]
+  file2clrdat.py INPUT_ROM [(-s SEARCH_TYPE -d DAT_FILE [-m DIR] [-u DIR])]
   file2clrdat.py --help
 
 Arguments:
@@ -151,10 +151,13 @@ class File2clrdat(object):
             else:
                 if self.unmatched_dir:
                     self._move_file(self.unmatched_dir)
-
                 self.__get_template_content()
                 self.__populate_template()
                 self.__write_populated_template()
+        else:
+            self.__get_template_content()
+            self.__populate_template()
+            self.__write_populated_template()   
 
     def _move_file(self, destination_dir):
         """
@@ -304,8 +307,9 @@ if __name__ == "__main__":
             print ('MATCHED_DIR and UNMATCHED_DIR must be different.')
             sys.exit(3)
 
-    if ARGS['--searchtype'] in MY_FILE2CLRDAT.VALID_SEARCH_TYPES:
-        MY_FILE2CLRDAT.generate_rom_data()
-    else:
-        print('- %s is not a valid search type. Use --help to more info.'
-              % ARGS['--searchtype'])
+    if ARGS['--searchtype']:
+        if not ARGS['--searchtype'] in MY_FILE2CLRDAT.VALID_SEARCH_TYPES:
+            print('- %s is not a valid search type. Use --help to more info.'
+                  % ARGS['--searchtype'])
+            sys.exit(4)
+    MY_FILE2CLRDAT.generate_rom_data()
