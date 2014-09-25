@@ -92,8 +92,13 @@ class File2clrdat(object):
         Checks if a given content is insde dat file
 
         Return: If content was found, returns filename
-        """
 
+        :type search_type: string
+        :param search_type: Type of search (md5, size, crc...)
+
+        :type search_content: string
+        :param search_content: Content that will be matched
+        """
         if search_type == "crc32":
             search_type = "crc"  # I need this to match with File class
 
@@ -134,7 +139,11 @@ class File2clrdat(object):
         self.__write_populated_template()
 
     def __user_confirm(self, confirm_msg):
-        """get user confirmation to proceed"""
+        """
+        Get user confirmation to proceed
+
+        Return: True if user confirmed, False if not
+        """
         user_choice = raw_input(confirm_msg)
         if user_choice == 'y':
             return True
@@ -143,14 +152,24 @@ class File2clrdat(object):
         else:
             return self.__user_confirm(confirm_msg)
 
-    def __print_match_found_in_datfile(self, input_romfile, datfile):
-        """ Print found match msg """
+    def __print_match_found_in_datfile(self, input_romfile,
+                                       rom_found_in_datfile):
+        """
+        Print found match msg
 
+        Return: None
+
+        :type input_romfile: string
+        :param input_romfile: Input file
+
+        :type rom_found_in_datfile: string
+        :param rom_found_in_datfile: Rom matched in datfile
+        """
         message = """
         Input rom file found in provided dat file:
         - Input rom file: %s
         - Rom name in dat: %s
-        """ % (input_romfile, datfile)
+        """ % (input_romfile, rom_found_in_datfile)
 
         print(message)
 
