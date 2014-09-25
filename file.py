@@ -20,26 +20,26 @@ class File(object):
     File class
     """
 
-    def __init__(self, pathAndName):
+    def __init__(self, path_and_name):
         """
         Class initialiser
 
         Return: None
 
-        :type inputPath: pathAndName
+        :type inputPath: path_and_name
         :param inputPath: full path/filename of the source file
         """
-        self.pathAndName = os.path.abspath(pathAndName)
-        self.name = os.path.basename(self.pathAndName)
+        self.path_and_name = os.path.abspath(path_and_name)
+        self.name = os.path.basename(self.path_and_name)
         self.nameNoExtension = os.path.splitext(self.name)[0]
-        self.path = os.path.dirname(self.pathAndName)
+        self.path = os.path.dirname(self.path_and_name)
         # size needs to be converted to str...
-        self.size = str(os.path.getsize(self.pathAndName))
+        self.size = str(os.path.getsize(self.path_and_name))
 
     name = None
     nameNoExtension = None
     path = None
-    pathAndName = None
+    path_and_name = None
     size = None
     creationTime = None
     modificationTime = None
@@ -48,13 +48,13 @@ class File(object):
     sha1 = None
     FILE_BLOCK_SIZE_READ = 8192
 
-    def getHashes(self):
+    def get_hashes(self):
         """
         Calculates file hashes
 
         Return: None
         """
-        with open(self.pathAndName, 'rb') as openedFile:
+        with open(self.path_and_name, 'rb') as openedFile:
             self.crc32 = 0
             self.md5 = hashlib.md5()
             self.sha1 = hashlib.sha1()

@@ -115,7 +115,7 @@ class File2clrdat(object):
         Return: None
         """
         self.file_data = File(self.input_path)
-        self.file_data.getHashes()
+        self.file_data.get_hashes()
 
         if self.datfile_path:
             rom_found_in_datfile = self.search_in_datfile(
