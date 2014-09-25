@@ -19,8 +19,9 @@ Options:
                                        value to match with INPUT_ROM. Accepted
                                        "type" values: size, crc, md5, sha1
                                        Must be used with "-d" option.
-  -d DAT_FILE, --datfile=DAT_FILE      Search INPUT_ROM md5 hash in a
-                                       ClrMamePro dat file and notify on match
+  -d DAT_FILE, --datfile=DAT_FILE      File that will be searched, type of 
+                                       search is given with "-s" option.
+                                       Must be used with "-s" option.
   -m MATCHED_DIR, --matcheddir=DIR     INPUT_ROM will be moved to MATCHED_DIR
                                        if exists in DAT_FILE.
                                        Must be used with "-sd" options.
