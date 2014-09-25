@@ -36,8 +36,7 @@ import sys  # needed for get python version and argv
 import string  # needed for templating
 import os  # needed for file and path manipulations
 from file import File  # class for get file data (hashes, size, etc)
-
-from lxml import objectify # for parsinge dat file
+from lxml import objectify  # for parsinge dat file
 
 
 class File2clrdat(object):
@@ -45,50 +44,50 @@ class File2clrdat(object):
     file2clrdat class
     """
 
-    def __init__(self, inputPath, datFilePath, search_type):
+    def __init__(self, input_path, datfile_path, search_type):
         """
         Class initialiser
 
         Return: None
 
-        :type inputPath: string
-        :param inputPath: file or directory to work with
+        :type input_path: string
+        :param input_path: file or directory to work with
 
-        :type datFilePath: string
-        :param datFilePath: work dat file
+        :type datfile_path: string
+        :param datfile_path: work dat file
 
         :type search_type: string
         :param search_type: value that will be searched in dat file
         """
-        self.inputPath = inputPath
-        self.datFilePath = datFilePath
+        self.input_path = input_path
+        self.datfile_path = datfile_path
         self.search_type = search_type
 
-    inputPath = None
+    input_path = None
     search_type = None
-    datFilePath = None
-    fileData = None
+    datfile_path = None
+    file_data = None
     validSearchTypes = ['size', 'md5', 'crc32', 'sha1']
     SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
     romTemplateFile = os.path.join(SCRIPT_PATH, 'ClrMamePro_rom_dat.tpl')
-    romTemplateContent = None
-    romTemplatePopulated = None
+    rom_template_content = None
+    rom_template_populated = None
 
-    def generateRomData(self):
+    def generate_rom_data(self):
         """
         Calls functions to acording if input is file or derectory
 
         Return: None
         """
-        # TODO: Move inputPath initialiser arg to this function
-        if os.path.isfile(self.inputPath):
-            self.__processFile()
-        elif os.path.isdir(self.inputPath):
-            self.__processDirectory()
+        # TODO: Move input_path initialiser arg to this function
+        if os.path.isfile(self.input_path):
+            self.__process_file()
+        elif os.path.isdir(self.input_path):
+            self.__process_directory()
         else:
             print("Invalid file or directory")
 
-    def searchInDatFile(self, search_type, search_content):
+    def search_in_datfile(self, search_type, search_content):
         """
         Checks if a given content is insde dat file
 
@@ -96,9 +95,9 @@ class File2clrdat(object):
         """
 
         if search_type == "crc32":
-            search_type = "crc" # I need this to match with File class
+            search_type = "crc"  # I need this to match with File class
 
-        with open(self.datFilePath) as f_xml:
+        with open(self.datfile_path) as f_xml:
             xml_data = f_xml.read()
 
         datafile = objectify.fromstring(xml_data)
@@ -109,102 +108,101 @@ class File2clrdat(object):
                 if game.get(search_type) == search_content:
                     return game.get("name")
 
-    def __processFile(self):
+    def __process_file(self):
         """
         Calls all methods to process a file
 
         Return: None
         """
-        self.fileData = File(self.inputPath)
-        self.fileData.getHashes()
+        self.file_data = File(self.input_path)
+        self.file_data.getHashes()
 
-        if self.datFilePath:
-            romFoundInDatFile = self.searchInDatFile(
-                self.search_type, getattr(self.fileData, self.search_type))
-            if romFoundInDatFile:
-                self.__printMatchFoundInDatFile(
-                    self.inputPath, romFoundInDatFile)
-                confirm = self.__userConfirm(
+        if self.datfile_path:
+            rom_found_in_datfile = self.search_in_datfile(
+                self.search_type, getattr(self.file_data, self.search_type))
+            if rom_found_in_datfile:
+                self.__print_match_found_in_datfile(
+                    self.input_path, rom_found_in_datfile)
+                confirm = self.__user_confirm(
                     'Do you want to generate romdata file anyway? (y or n)')
-                if confirm != True:
+                if confirm is not True:
                     print('Ignoring file...')
                     return
 
-        self.__getTemplateContent()
-        self.__populateTemplate()
-        self.__writePopulatedTemplate()
+        self.__get_template_content()
+        self.__populate_template()
+        self.__write_populated_template()
 
-    def __userConfirm(self, confirmMsg):
+    def __user_confirm(self, confirm_msg):
         """get user confirmation to proceed"""
-        userChoice = raw_input(confirmMsg)
-        if userChoice == 'y':
+        user_choice = raw_input(confirm_msg)
+        if user_choice == 'y':
             return True
-        elif userChoice == 'n':
+        elif user_choice == 'n':
             return False
         else:
-            return self.__userConfirm(confirmMsg)
+            return self.__user_confirm(confirm_msg)
 
-    def __printMatchFoundInDatFile(self, inputRomFile, datFile):
+    def __print_match_found_in_datfile(self, input_romfile, datfile):
         """ Print found match msg """
 
         message = """
         Input rom file found in provided dat file:
         - Input rom file: %s
         - Rom name in dat: %s
-        """ % (inputRomFile, datFile)
+        """ % (input_romfile, datfile)
 
         print(message)
 
-
-    def __processDirectory(self):
+    def __process_directory(self):
         """
         Calls all methods to process a directory
 
         Return: None
         """
-        for root, dirs, files in os.walk(self.inputPath):
+        for root, dirs, files in os.walk(self.input_path):
             for thisfile in files:
-                self.inputPath = os.path.join(root, thisfile)
-                self.__processFile()
+                self.input_path = os.path.join(root, thisfile)
+                self.__process_file()
 
-    def __getTemplateContent(self):
+    def __get_template_content(self):
         """
         Gets content of template file
 
         Return: None
         """
-        fRomTemplate = open(self.romTemplateFile)
-        self.romTemplateContent = string.Template(fRomTemplate.read())
-        fRomTemplate.close()
+        f_rom_template = open(self.romTemplateFile)
+        self.rom_template_content = string.Template(f_rom_template.read())
+        f_rom_template.close()
 
-    def __populateTemplate(self):
+    def __populate_template(self):
         """
         Puts file data inside template
 
         Return: None
         """
-        templateDictionary = {
-            'gameName': self.fileData.nameNoExtension,
-            'romDescription': self.fileData.nameNoExtension,
-            'romName': self.fileData.name,
-            'romSize': self.fileData.size,
-            'romCrc': self.fileData.crc32,
-            'romMd5': self.fileData.md5,
-            'romSha1': self.fileData.sha1
+        template_dictionary = {
+            'gameName': self.file_data.nameNoExtension,
+            'romDescription': self.file_data.nameNoExtension,
+            'romName': self.file_data.name,
+            'romSize': self.file_data.size,
+            'romCrc': self.file_data.crc32,
+            'romMd5': self.file_data.md5,
+            'romSha1': self.file_data.sha1
             }
-        self.romTemplatePopulated = (
-            self.romTemplateContent.safe_substitute(templateDictionary)
+        self.rom_template_populated = (
+            self.rom_template_content.safe_substitute(template_dictionary)
             )
 
-    def __writePopulatedTemplate(self):
+    def __write_populated_template(self):
         """
         Writes rom data to output file
 
         Return: None
         """
-        fOutput = open(self.fileData.pathAndName + '_romdata', "w")
-        print(self.romTemplatePopulated, file=fOutput)
-        fOutput.close()
+        f_output = open(self.file_data.pathAndName + '_romdata', "w")
+        print(self.rom_template_populated, file=f_output)
+        f_output.close()
 
 
 if __name__ == "__main__":
@@ -232,10 +230,10 @@ if __name__ == "__main__":
 
     ARGS = docopt(__doc__, version='1.0.0rc2')
 
-    file2clrdat = File2clrdat(
+    my_file2clrdat = File2clrdat(
         ARGS['INPUT_ROM'], ARGS['--datfile'], ARGS['--searchtype'])
-    if ARGS['--searchtype'] in file2clrdat.validSearchTypes:
-        file2clrdat.generateRomData()
+    if ARGS['--searchtype'] in my_file2clrdat.validSearchTypes:
+        my_file2clrdat.generate_rom_data()
     else:
         print('- %s is not a valid search type. Use --help to more info.'
-            % ARGS['--searchtype'])
+              % ARGS['--searchtype'])
