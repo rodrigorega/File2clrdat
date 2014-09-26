@@ -195,16 +195,12 @@ class File2clrdat(object):
         :param destination_dir: Directory where file will be moved
         """
         destination_file = os.path.join(destination_dir, self.file_data.name)
-        count = 0
-        while os.path.exists(destination_file):
-            count += 1
-            destination_file = os.path.join(destination_dir, '%s (%d) %s' %
-                                            (self.file_data.nameNoExtension,
-                                             count, self.file_data.extension))
+        destination_file = self.file_data.compose_unique_filename(destination_file)
+
         if self.copy_scanned:
-            shutil.copy2(self.input_path, destination_file)
+            shutil.copy2(self.file_data.path_and_name, destination_file)
         else:
-            shutil.move(self.input_path, destination_file)
+            shutil.move(self.file_data.path_and_name, destination_file)
 
     def __print_match_found_in_datfile(self, rom_found_in_datfile):
         """

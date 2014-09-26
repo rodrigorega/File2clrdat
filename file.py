@@ -72,3 +72,22 @@ class File(object):
             self.crc = self.crc.lower()
             self.md5 = self.md5.hexdigest()
             self.sha1 = self.sha1.hexdigest()
+
+    def compose_unique_filename(self, path_and_filename):
+        """
+        Checks if a filename exists, if exists returns a unique filename.
+
+        :type path_and_filename: string
+        :param path_and_filename: File which will be test if exists.
+
+        Return: Unique filename or the 'path_and_filename' unchanged.
+        """
+        path = os.path.dirname(path_and_filename)
+        nameNoExtension, extension = os.path.splitext(path_and_filename)
+
+        count = 0
+        while os.path.exists(path_and_filename):
+            count += 1
+            path_and_filename = os.path.join(path, '%s (%d)%s' %
+                                            (nameNoExtension, count, extension))
+        return path_and_filename
