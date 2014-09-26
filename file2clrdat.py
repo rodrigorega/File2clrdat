@@ -8,26 +8,27 @@ of update ClrMamePro .dat files, without using ClrMamePro.
 
 Usage:
   file2clrdat.py INPUT_ROM
-  file2clrdat.py INPUT_ROM [(-s SEARCH_TYPE -d DAT_FILE [-m DIR] [-u DIR])]
+  file2clrdat.py INPUT_ROM [(-d DAT_FILE [-m DIR] [-u DIR] [-c])] [-s SEARCH_TYPE]
   file2clrdat.py --help
 
 Arguments:
   INPUT_ROM                            Input rom file o directory with roms.
 
 Options:
-  -s SEARCH_TYPE, --searchtype=type    Search inside a dat file for a type of
-                                       value to match with INPUT_ROM. Accepted
-                                       "type" values: size, crc, md5, sha1
-                                       Must be used with "-d" option.
-  -d DAT_FILE, --datfile=DAT_FILE      File that will be searched, type of
-                                       search is given with "-s" option.
-                                       Must be used with "-s" option.
+  -d DAT_FILE, --datfile=DAT_FILE      Dat file that will be searched, type of
+                                       search can be changed with "-s" option.
   -m MATCHED_DIR, --matcheddir=DIR     INPUT_ROM will be moved to MATCHED_DIR
                                        if exists in DAT_FILE.
-                                       Must be used with "-sd" options.
+                                       Must be used with "-d" option.
   -u UNMATCHED_DIR --unmatcheddir=DIR  INPUT_ROM will be moved to UNMATCHED_DIR
                                        if not exists in DAT_FILE.
-                                       Must be used with "-sd" options.
+                                       Must be used with "-d" option.
+  -c, --copy                           Copy roms instead move them.
+                                       Must be used with "-m" or "-u" options.
+  -s SEARCH_TYPE, --searchtype=type    Set type of search that "-d" option will
+                                       use. Valid "types": size, crc, md5, sha1
+                                       Must be used with "-d" option.
+                                       [default: sha1]
   -h, --help                           Show this help screen.
 
 Output:
@@ -38,11 +39,11 @@ Examples:
   - Generate rom info (rom.bin_rondata) from a single rom file:
       file2clrdat.py "c:\my_downloads\rom.bin"
 
-  - Scan a directory, match sha1 hashes of every file in that directory with
+  - Scan a directory, match md5 hashes of every file in that directory with
     a dat file, matched files will be moved to "dupe_roms" directory, files not
     found in dat file will be moved to "new_roms" directory adding a file with
     rom data for every file:
-      file2clrdat.py "c:\my_downloaded_roms" -s sha1 -d "c:\my_dat_wip\my_dat.dat" -m "c:\my_dat_wip\dupe_roms" -u "c:\my_dat_wip\new_roms"
+      file2clrdat.py "c:\my_downloaded_roms" -s md5 -d "c:\my_dat_wip\my_dat.dat" -m "c:\my_dat_wip\dupe_roms" -u "c:\my_dat_wip\new_roms"
 
 Author: Rodrigo Rega <contacto@rodrigorega.es>
 License: CC-BY-SA 3.0 license (http://creativecommons.org/licenses/by/3.0/
@@ -52,6 +53,7 @@ from __future__ import print_function  # used for print to files
 import sys  # needed for get python version and argv
 import string  # needed for templating
 import os  # needed for file and path manipulations
+import shutil # needed for copy files
 from file import File  # class for get file data (hashes, size, etc)
 from lxml import objectify  # for parsing dat file
 
@@ -62,7 +64,7 @@ class File2clrdat(object):
     """
 
     def __init__(self, input_path, datfile_path,
-                 search_type, matched_dir, unmatched_dir):
+                 search_type, matched_dir, unmatched_dir, copy_scanned):
         """
         Class initializer
 
@@ -82,12 +84,14 @@ class File2clrdat(object):
         self.search_type = search_type
         self.matched_dir = matched_dir
         self.unmatched_dir = unmatched_dir
+        self.copy_scanned = copy_scanned
 
     input_path = None
     search_type = None
     datfile_path = None
     matched_dir = None
     unmatched_dir = None
+    copy_scanned = False
     file_data = None
     VALID_SEARCH_TYPES = ['size', 'md5', 'crc', 'sha1']
     SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -147,21 +151,22 @@ class File2clrdat(object):
             if rom_found_in_datfile:
                 self.__print_match_found_in_datfile(rom_found_in_datfile)
                 if self.matched_dir:
-                    self._move_file(self.matched_dir)
+                    self._move_or_copy_file(self.matched_dir)
             else:
                 if self.unmatched_dir:
-                    self._move_file(self.unmatched_dir)
+                    self._move_or_copy_file(self.unmatched_dir)
                 self.__get_template_content()
                 self.__populate_template()
                 self.__write_populated_template()
         else:
             self.__get_template_content()
             self.__populate_template()
-            self.__write_populated_template()   
+            self.__write_populated_template()
 
-    def _move_file(self, destination_dir):
+    def _move_or_copy_file(self, destination_dir):
         """
-        Move rom file to a given directory. If exists it will be renamed.
+        Move or copy rom file to a given directory.
+        If exists it will be renamed.
 
         Return: None
 
@@ -175,7 +180,10 @@ class File2clrdat(object):
             destination_file = os.path.join(destination_dir, '%s (%d) %s' %
                                             (self.file_data.nameNoExtension,
                                              count, self.file_data.extension))
-        os.rename(self.input_path, destination_file)
+        if self.copy_scanned:
+            shutil.copy2(self.input_path, destination_file)
+        else:
+            shutil.move(self.input_path, destination_file)
 
     def __print_match_found_in_datfile(self, rom_found_in_datfile):
         """
@@ -300,7 +308,7 @@ if __name__ == "__main__":
     ARGS = docopt(__doc__, version='1.0.0rc2')
     MY_FILE2CLRDAT = File2clrdat(
         ARGS['INPUT_ROM'], ARGS['--datfile'], ARGS['--searchtype'],
-        ARGS['--matcheddir'], ARGS['--unmatcheddir'])
+        ARGS['--matcheddir'], ARGS['--unmatcheddir'], ARGS['--copy'])
 
     if ARGS['--matcheddir'] and ARGS['--unmatcheddir']:
         if ARGS['--matcheddir'] == ARGS['--unmatcheddir']:
