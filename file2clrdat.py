@@ -53,9 +53,9 @@ from __future__ import print_function  # used for print to files
 import sys  # needed for get python version and argv
 import string  # needed for templating
 import os  # needed for file and path manipulations
-import shutil # needed for copy files
+import shutil  # needed for copy files
 from file import File  # class for get file data (hashes, size, etc)
-from lxml import objectify  # for parsing dat file
+from lxml import objectify, etree  # for parsing dat file
 
 
 class File2clrdat(object):
@@ -95,6 +95,7 @@ class File2clrdat(object):
     file_data = None
     VALID_SEARCH_TYPES = ['size', 'md5', 'crc', 'sha1']
     SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
+    clrmamepro_dtd_file = 'C:\lab\_wip\File2clrdat\datafile.dtd'
     rom_template_file = os.path.join(SCRIPT_PATH, 'ClrMamePro_rom_dat.tpl')
     rom_template_content = None
     rom_template_populated = None
@@ -130,11 +131,31 @@ class File2clrdat(object):
 
         datafile = objectify.fromstring(xml_data)
 
-        # loop over elements and print their tags and text
+        xml_error = self.validate_xml_with_dtd(datafile)
+        if xml_error:
+            print('- Provided file is not a valid ClrMamePro dat file.')
+            print(xml_error)
+            sys.exit(5)
+
         for games in datafile.getchildren():
             for game in games.getchildren():
                 if game.get(search_type) == search_content:
                     return game.get("name")
+
+    def validate_xml_with_dtd(self, xml_data):
+        """
+        Validate ClrMamePro format against a DTD file
+
+        :type xml_data: string
+        :param xml_data: XML data to validate.
+
+        Return: None if validate is ok. On validate error returns failure info.
+        """
+        f_dtd = open(self.clrmamepro_dtd_file)
+        dtd = etree.DTD(f_dtd)
+        f_dtd.close()
+        if not dtd.validate(xml_data):
+            return dtd.error_log.filter_from_errors()[0]
 
     def __process_file(self):
         """

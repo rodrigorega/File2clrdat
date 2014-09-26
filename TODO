@@ -9,10 +9,10 @@ TODO:
 - Verify if match directories exists, maybe create them.
 - Add date to renamed files.
 - If recursive is selected verify, -m and -u folders to avoid problems.
-- Verify if dat file is valid xml.
 
 DONE:
 - Process all files in a given directory.
 - Find hashes in a pre-existing .dat file.
 - Verify input dir. and output dir. are not the same.
 - Add option to copy files instead move them.
+- Verify if dat file is valid xml.
