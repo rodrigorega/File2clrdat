@@ -288,6 +288,8 @@ class File2clrdat(object):
             dst_dir = self.file_data.path
 
         romdata_file = os.path.join(dst_dir, self.file_data.name + '_romdata')
+        romdata_file = self.file_data.compose_unique_filename(romdata_file)
+
         f_output = open(romdata_file, "w")
         print(self.rom_template_populated, file=f_output)
         f_output.close()
