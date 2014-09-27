@@ -226,3 +226,4 @@ pip-log.txt
 !.gitignore
 !file2clrdat.bat
 !file.py
+!datafile.dtd
