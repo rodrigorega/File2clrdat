@@ -55,7 +55,7 @@ import string  # needed for templating
 import os  # needed for file and path manipulations
 import shutil  # needed for copy files
 from file import File  # class for get file data (hashes, size, etc)
-from lxml import objectify # for parsing dat file
+from lxml import objectify  # for parsing dat file
 
 
 class File2clrdat(object):
@@ -180,7 +180,7 @@ class File2clrdat(object):
         :param destination_dir: Directory where file will be moved
         """
         destination_file = os.path.join(destination_dir, self.file_data.name)
-        destination_file = self.file_data.compose_unique_filename(destination_file)
+        destination_file = self.file_data.compose_unique_filename(destination_file, 'timestamp')
 
         if self.copy_scanned:
             shutil.copy2(self.file_data.path_and_name, destination_file)
@@ -273,7 +273,7 @@ class File2clrdat(object):
             dst_dir = self.file_data.path
 
         romdata_file = os.path.join(dst_dir, self.file_data.name + '_romdata')
-        romdata_file = self.file_data.compose_unique_filename(romdata_file)
+        romdata_file = self.file_data.compose_unique_filename(romdata_file, 'timestamp')
 
         f_output = open(romdata_file, "w")
         print(self.rom_template_populated, file=f_output)

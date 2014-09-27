@@ -14,6 +14,8 @@ import os
 import hashlib  # needed to hash md5 and sha1
 import zlib  # needed to hash crc32
 from lxml import etree  # for xmld validation against dtd file
+import datetime  # needed for add timestamp to filenames
+
 
 class File(object):
     """
@@ -73,23 +75,34 @@ class File(object):
             self.md5 = self.md5.hexdigest()
             self.sha1 = self.sha1.hexdigest()
 
-    def compose_unique_filename(self, path_and_filename):
+    def compose_unique_filename(self, path_and_filename, differentiator):
         """
         Checks if a filename exists, if exists returns a unique filename.
 
         :type path_and_filename: string
         :param path_and_filename: File which will be test if exists.
 
+        :type differentiator: string
+        :param differentiator: Can be: "timestamp", "number"
+
         Return: Unique filename or the 'path_and_filename' unchanged.
         """
+        timestamp_format = '%Y-%m-%d-%H-%M-%S'
         path = os.path.dirname(path_and_filename)
         nameNoExtension, extension = os.path.splitext(path_and_filename)
 
         count = 0
         while os.path.exists(path_and_filename):
-            count += 1
-            path_and_filename = os.path.join(path, '%s (%d)%s' %
-                                            (nameNoExtension, count, extension))
+            if differentiator is 'timestamp':
+                path_and_filename = os.path.join(path, '%s (%s)%s' %
+                                                 (nameNoExtension, datetime.datetime.now().strftime(timestamp_format), extension))
+            elif differentiator is 'number':
+                count += 1
+                path_and_filename = os.path.join(path, '%s (%d)%s' %
+                                                 (nameNoExtension, count, extension))
+            else:
+                print('Invalid differentiator')
+                sys.exit(2)
         return path_and_filename
 
     def validate_xml_with_dtd(self, xml_data, dtd_file):

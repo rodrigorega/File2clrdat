@@ -1,7 +1,6 @@
 TODO:
 - Merge output file to pre-existing .dat file.
 - Check if utf8 is working with filenames.
-- Add to output filename creation date-time.
 - Configurable output file filename.
 - Verbose output to console.
 - Output messages to log file.
@@ -9,6 +8,8 @@ TODO:
 - Verify if match directories exists, maybe create them.
 - Add date to renamed files.
 - If recursive is selected verify, -m and -u folders to avoid problems.
+- Rom and _romdata should always have the same (#).
+- Option to chose unique filename differentiator.
 
 DONE:
 - Process all files in a given directory.
@@ -16,3 +17,4 @@ DONE:
 - Verify input dir. and output dir. are not the same.
 - Add option to copy files instead move them.
 - Verify if dat file is valid xml.
+- Add to output filename creation date-time.
