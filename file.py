@@ -13,7 +13,7 @@ License: CC-BY-SA 3.0 license (http://creativecommons.org/licenses/by/3.0/
 import os
 import hashlib  # needed to hash md5 and sha1
 import zlib  # needed to hash crc32
-
+from lxml import etree  # for xmld validation against dtd file
 
 class File(object):
     """
@@ -91,3 +91,21 @@ class File(object):
             path_and_filename = os.path.join(path, '%s (%d)%s' %
                                             (nameNoExtension, count, extension))
         return path_and_filename
+
+    def validate_xml_with_dtd(self, xml_data, dtd_file):
+        """
+        Validate a xmlfile against a DTD file
+
+        :type xml_data: lxml.objectify.ObjectifiedElement
+        :param xml_data: XML data to validate.
+
+        :type dtd_file: string
+        :param dtd_file: Full path to .dtd file.
+
+        Return: None if validate is ok. On validate error returns failure info.
+        """
+        f_dtd = open(dtd_file)
+        dtd = etree.DTD(f_dtd)
+        f_dtd.close()
+        if not dtd.validate(xml_data):
+            return dtd.error_log.filter_from_errors()[0]

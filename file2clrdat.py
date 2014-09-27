@@ -55,7 +55,7 @@ import string  # needed for templating
 import os  # needed for file and path manipulations
 import shutil  # needed for copy files
 from file import File  # class for get file data (hashes, size, etc)
-from lxml import objectify, etree  # for parsing dat file
+from lxml import objectify # for parsing dat file
 
 
 class File2clrdat(object):
@@ -131,7 +131,7 @@ class File2clrdat(object):
 
         datafile = objectify.fromstring(xml_data)
 
-        xml_error = self.validate_xml_with_dtd(datafile)
+        xml_error = self.file_data.validate_xml_with_dtd(datafile, self.clrmamepro_dtd_file)
         if xml_error:
             print('- Provided file is not a valid ClrMamePro dat file.')
             print(xml_error)
@@ -141,21 +141,6 @@ class File2clrdat(object):
             for game in games.getchildren():
                 if game.get(search_type) == search_content:
                     return game.get("name")
-
-    def validate_xml_with_dtd(self, xml_data):
-        """
-        Validate ClrMamePro format against a DTD file
-
-        :type xml_data: string
-        :param xml_data: XML data to validate.
-
-        Return: None if validate is ok. On validate error returns failure info.
-        """
-        f_dtd = open(self.clrmamepro_dtd_file)
-        dtd = etree.DTD(f_dtd)
-        f_dtd.close()
-        if not dtd.validate(xml_data):
-            return dtd.error_log.filter_from_errors()[0]
 
     def __process_file(self):
         """
