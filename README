@@ -40,4 +40,5 @@ Examples:
       file2clrdat.py "c:\my_downloaded_roms" -s md5 -d "c:\my_dat_wip\my_dat.dat" -m "c:\my_dat_wip\dupe_roms" -u "c:\my_dat_wip\new_roms"
 
 Author: Rodrigo Rega <contacto@rodrigorega.es>
+Script URL: https://github.com/rodrigorega/File2clrdat
 License: CC-BY-SA 3.0 license (http://creativecommons.org/licenses/by/3.0/
